@@ -1,4 +1,5 @@
 import random
+import time
 
 from dag import DAG
 
@@ -7,7 +8,7 @@ def main():
     # Create a new DAG instance
     dag = DAG()
 
-    num_vertices = 8
+    num_vertices = 10000
     vertices = [f'V{i}' for i in range(num_vertices)]
 
     # Randomly add edges to form a DAG
@@ -22,10 +23,13 @@ def main():
 
     assert not dag.has_cycle()
 
+    start_time = time.time()
     print(f'Topological sort: {dag.topological_sort()}')
+    end_time = time.time()
+    print(f'Time taken: {end_time - start_time} seconds')
 
     # Draw the DAG and save it as a JPEG image
-    dag.draw('sample_dag.jpeg')
+    # dag.draw('sample_dag.jpeg')
 
 if __name__ == "__main__":
     main()

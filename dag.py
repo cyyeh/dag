@@ -1,3 +1,7 @@
+from collections import deque
+from typing import Dict, List, Literal
+
+
 class DAG:
     def __init__(self):
         self.graph = {}
@@ -38,7 +42,7 @@ class DAG:
         rec_stack[vertex] = False
         return False
 
-    def has_cycle(self):
+    def _has_cycle_recursive(self):
         # visited is a dictionary that keeps track of the vertices that have been visited
         visited = {vertex: False for vertex in self.graph}
         # rec_stack is a dictionary that keeps track of the vertices that are currently in the recursion stack
@@ -49,6 +53,13 @@ class DAG:
                 if self._has_cycle_util(vertex, visited, rec_stack):
                     return True
         return False
+
+    def _has_cycle_iterative(self) -> bool:
+        try:
+            self.topological_sort('iterative')
+            return False
+        except ValueError:
+            return True
 
     def _topological_sort_util(self, vertex, visited, stack):
         """
@@ -68,7 +79,7 @@ class DAG:
                 self._topological_sort_util(neighbor, visited, stack)
         stack.insert(0, vertex)
 
-    def topological_sort(self):
+    def _topological_sort_recursive(self):
         visited = {vertex: False for vertex in self.graph}
         stack = []
 
@@ -77,6 +88,46 @@ class DAG:
                 self._topological_sort_util(vertex, visited, stack)
 
         return stack
+
+    def _topological_sort_iterative(self) -> List[int]:
+        # Initialize tracking dictionaries
+        in_degree = {vertex: 0 for vertex in self.graph}
+
+        # Calculate in-degrees of all vertices
+        for vertex in self.graph:
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] += 1
+
+        # Collect all vertices with in-degree 0
+        zero_in_degree = deque([v for v in self.graph if in_degree[v] == 0])
+        topological_order = []
+
+        while zero_in_degree:
+            vertex = zero_in_degree.popleft()
+            topological_order.append(vertex)
+
+            # Decrease the in-degree of all neighbors
+            for neighbor in self.graph[vertex]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    zero_in_degree.append(neighbor)
+
+        if len(topological_order) != len(self.graph):
+            raise ValueError("Graph has at least one cycle")
+
+        return topological_order
+
+    def has_cycle(self, type: Literal['iterative', 'recursive'] = 'iterative') -> bool:
+        if type == 'iterative':
+            return self._has_cycle_iterative()
+        else:
+            return self._has_cycle_recursive()
+
+    def topological_sort(self, type: Literal['iterative', 'recursive'] = 'iterative') -> List[int]:
+        if type == 'iterative':
+            return self._topological_sort_iterative()
+        else:
+            return self._topological_sort_recursive()
 
     def draw(self, filename='dag_graph.jpeg'):
         import networkx as nx
