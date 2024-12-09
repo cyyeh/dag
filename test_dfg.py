@@ -116,4 +116,4 @@ def test_operation_type_checking():
 
 
 if __name__ == '__main__':
-    pytest.main([__file__])
+    pytest.main()
