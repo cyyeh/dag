@@ -90,6 +90,24 @@ class DAG:
         return stack
 
     def _topological_sort_iterative(self) -> List[int]:
+        '''
+        Topological sort using Kahn's algorithm
+
+        1. Calculate the in-degree (number of incoming edges) for each vertex
+        2. Start with vertices that have no incoming edges (in-degree = 0)
+        3. For each vertex we process:
+            - Add it to the result
+            - Remove its edges (by decreasing in-degrees of its neighbors)
+            - Add any new vertices with in-degree 0 to the queue
+        4. If we can't process all vertices, there must be a cycle
+        
+        The main advantage of this iterative approach over the recursive DFS approach is that it:
+        - Has better space complexity (O(V) vs O(V) for recursion stack)
+        - Naturally detects cycles
+        - Is generally easier to understand and debug
+
+        The time complexity remains O(V + E) where V is the number of vertices and E is the number of edges.
+        '''
         # Initialize tracking dictionaries
         in_degree = {vertex: 0 for vertex in self.graph}
 
